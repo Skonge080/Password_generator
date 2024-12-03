@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор Паролей</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7fc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .password {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            background-color: #f4f7fc;
+            padding: 10px;
+            border: 2px solid #dcdfe7;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            min-height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: pre-wrap;
+            word-break: break-all;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .password.copied {
+            background-color: #c8e6c9;
+            color: #388e3c;
+            border-color: #388e3c;
+        }
+
+        button {
+            background-color: #5c6bc0;
+            color: #fff;
+            border: none;
+            padding: 15px 25px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        button:hover {
+            background-color: #3f51b5;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+        }
+
+        footer a {
+            color: #5c6bc0;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .info-btn {
+            background-color: #009688;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .info-btn:hover {
+            background-color: #00796b;
+        }
+
+        .slider-container {
+            margin-bottom: 20px;
+        }
+
+        .slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .checkbox-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group label {
+            font-size: 14px;
+        }
+
+        .password-length {
+            font-size: 14px;
+            color: #555;
+        }
+
+        /* Стиль уведомлений */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4caf50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 16px;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            z-index: 9999;
+        }
+
+        .notification.show {
+            display: block;
+            opacity: 1;
+        }
+
+        .notification.error {
+            background-color: #f44336; /* Красный цвет для ошибок */
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Генератор Паролей</h1>
+        <div class="password" id="password" onclick="copyPassword()">Нажмите кнопку для <br/>генерации пароля</div>
+
+        <div class="slider-container">
+            <label class="password-length" for="password-length">Длина пароля: <span id="length-value">16</span></label>
+            <input type="range" id="password-length" class="slider" min="8" max="32" value="16" />
+        </div>
+
+        <div class="checkbox-group">
+            <div>
+                <input type="checkbox" id="lowercase" checked />
+                <label for="lowercase">Малые буквы</label>
+            </div>
+            <div>
+                <input type="checkbox" id="uppercase" checked />
+                <label for="uppercase">Прописные буквы</label>
+            </div>
+        </div>
+
+        <div class="checkbox-group">
+            <div>
+                <input type="checkbox" id="numbers" checked />
+                <label for="numbers">Цифры</label>
+            </div>
+            <div>
+                <input type="checkbox" id="special" checked />
+                <label for="special">Специальные символы</label>
+            </div>
+        </div>
+
+        <button onclick="generatePassword()">Сгенерировать пароль</button>
+        <a href="info.html">
+            <button class="info-btn">Что такое генератор паролей?</button>
+        </a>
+
+        <footer>
+            <p>&copy; 2024 Генератор Паролей | <a href="code.html">Исходный код генератора</a></p>
+        </footer>
+    </div>
+
+    <!-- Уведомление -->
+    <div id="notification" class="notification">
+        Пароль скопирован!
+    </div>
+
+    <script>
+        function generatePassword() {
+            const length = document.getElementById('password-length').value;
+            const useLowercase = document.getElementById('lowercase').checked;
+            const useUppercase = document.getElementById('uppercase').checked;
+            const useNumbers = document.getElementById('numbers').checked;
+            const useSpecial = document.getElementById('special').checked;
+
+            let charset = "";
+            if (useLowercase) charset += "abcdefghijklmnopqrstuvwxyz";
+            if (useUppercase) charset += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            if (useNumbers) charset += "0123456789";
+            if (useSpecial) charset += "!@#$%^&*()";
+
+            // Проверка, если не выбран ни один тип символов
+            if (charset === "") {
+                document.getElementById('password').textContent = "";
+                showNotification("Пожалуйста, выберите хотя бы одну категорию символов!");
+                return; // Останавливаем выполнение, если нет выбранных символов
+            }
+
+            let password = "";
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * charset.length);
+                password += charset[randomIndex];
+            }
+
+            document.getElementById('password').textContent = password;
+            document.getElementById('length-value').textContent = length;
+
+            // Показываем уведомление о генерации пароля
+            showNotification("Пароль сгенерирован! Нажмите, чтобы скопировать.");
+        }
+
+
+        function copyPassword() {
+            const passwordField = document.getElementById('password');
+            const password = passwordField.textContent;
+
+            navigator.clipboard.writeText(password).then(() => {
+                passwordField.classList.add('copied'); // Добавляем класс, чтобы показать, что пароль скопирован
+                showNotification("Скопировано!"); // Показываем уведомление о копировании
+                setTimeout(() => {
+                    passwordField.classList.remove('copied'); // Убираем класс через 1 секунду
+                }, 1000);
+            });
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000); // Уведомление исчезает через 3 секунды
+        }
+
+        document.getElementById('password-length').addEventListener('input', generatePassword);
+        document.getElementById('lowercase').addEventListener('change', generatePassword);
+        document.getElementById('uppercase').addEventListener('change', generatePassword);
+        document.getElementById('numbers').addEventListener('change', generatePassword);
+        document.getElementById('special').addEventListener('change', generatePassword);
+    </script>
+
+</body>
+</html>
+
