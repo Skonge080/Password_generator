@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Исходный код генератора паролей</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7fc;
+            padding: 30px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        pre {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            color: #333;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+        }
+
+        footer a {
+            color: #5c6bc0;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Исходный код генератора паролей</h1>
+    
+    <pre>
+function generatePassword() {
+    const length = document.getElementById('password-length').value;
+    const useLowercase = document.getElementById('lowercase').checked;
+    const useUppercase = document.getElementById('uppercase').checked;
+    const useNumbers = document.getElementById('numbers').checked;
+    const useSpecial = document.getElementById('special').checked;
+
+    // Проверка, если не выбран ни один тип символов
+    if (charset === "") {
+        document.getElementById('password').textContent = "";
+        showNotification("Пожалуйста, выберите хотя бы одну категорию символов!");
+        return; // Останавливаем выполнение, если нет выбранных символов
+    }
+
+    let charset = "";
+    if (useLowercase) charset += "abcdefghijklmnopqrstuvwxyz";
+    if (useUppercase) charset += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    if (useNumbers) charset += "0123456789";
+    if (useSpecial) charset += "!@#$%^&*()";
+
+    let password = "";
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * charset.length);
+        password += charset[randomIndex];
+    }
+
+    document.getElementById('password').textContent = password;
+    document.getElementById('length-value').textContent = length;
+
+    // Показываем уведомление о генерации пароля
+    showNotification("Пароль сгенерирован! Нажмите, чтобы скопировать.");
+}
+
+function copyPassword() {
+    const passwordField = document.getElementById('password');
+    const password = passwordField.textContent;
+
+    navigator.clipboard.writeText(password).then(() => {
+        passwordField.classList.add('copied'); // Добавляем класс, чтобы показать, что пароль скопирован
+        showNotification("Скопировано!"); // Показываем уведомление о копировании
+        setTimeout(() => {
+            passwordField.classList.remove('copied'); // Убираем класс через 1 секунду
+        }, 1000);
+    });
+}
+
+function showNotification(message) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.classList.add('show');
+
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 3000); // Уведомление исчезает через 3 секунды
+}
+    </pre>
+
+    <footer>
+        <p>&copy; 2024 Генератор Паролей | <a href="index.html">Назад к генератору</a></p>
+    </footer>
+
+</body>
+</html>
+
